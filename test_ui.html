@@ -454,7 +454,7 @@
             formData.append('file', selectedFile);
 
             try {
-                const response = await fetch('http://localhost:8000/extract-piping-lines/', {
+                const response = await fetch('/extract-piping-lines/', {
                     method: 'POST',
                     body: formData
                 });
@@ -565,15 +565,15 @@
         // Check server status on page load
         window.addEventListener('load', async () => {
             try {
-                const response = await fetch('http://localhost:8000/health');
+                const response = await fetch('/health');
                 if (response.ok) {
                     const health = await response.json();
                     console.log('Server status:', health);
                 } else {
-                    showStatus('error', '❌ Server is not responding. Please start the FastAPI server.');
+                    showStatus('error', '❌ Server is not responding.');
                 }
             } catch (error) {
-                showStatus('error', '❌ Cannot connect to server. Please start the FastAPI server on localhost:8000');
+                showStatus('error', '❌ Cannot connect to server. Please check if the service is running.');
             }
         });
     </script>

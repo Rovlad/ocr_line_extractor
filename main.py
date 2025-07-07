@@ -18,7 +18,7 @@ import traceback
 from pathlib import Path
 
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # Add parent directory to sys.path to import PipingLineExtractor
@@ -65,11 +65,22 @@ async def root():
         "endpoints": {
             "POST /extract-piping-lines/": "Upload PDF and extract piping lines",
             "GET /health": "Health check",
+            "GET /test": "Web test interface",
             "GET /docs": "Interactive API documentation",
             "GET /redoc": "Alternative API documentation",
         },
         "version": "1.0.0",
     }
+
+
+@app.get("/test", response_class=HTMLResponse)
+async def test_interface():
+    """Serve the test UI HTML interface."""
+    try:
+        with open("test_ui.html", "r") as f:
+            return HTMLResponse(content=f.read(), status_code=200)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail="Test interface not found")
 
 
 @app.get("/health")
