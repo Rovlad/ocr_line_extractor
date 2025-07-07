@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piping Line Extractor - Test Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .upload-section {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: #4f46e5;
+            background: #f1f5f9;
+        }
+
+        .upload-section.dragover {
+            border-color: #4f46e5;
+            background: #eef2ff;
+            transform: scale(1.02);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+        }
+
+        .file-input-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e0f2fe;
+            border-radius: 8px;
+            border-left: 4px solid #0284c7;
+        }
+
+        .process-button {
+            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .process-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.3);
+        }
+
+        .process-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .status.loading {
+            background: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .status.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #059669;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #dc2626;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .results h2 {
+            color: #374151;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .metadata {
+            background: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .metadata h3 {
+            color: #4f46e5;
+            margin-bottom: 15px;
+        }
+
+        .metadata-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .metadata-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .metadata-item strong {
+            color: #374151;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .piping-lines {
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .piping-lines h3 {
+            background: #334155;
+            color: white;
+            padding: 15px 20px;
+            margin: 0;
+        }
+
+        .piping-line {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s ease;
+        }
+
+        .piping-line:hover {
+            background: #f1f5f9;
+        }
+
+        .piping-line:last-child {
+            border-bottom: none;
+        }
+
+        .line-number {
+            font-weight: 700;
+            color: #4f46e5;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .line-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .json-view {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .toggle-json {
+            background: #64748b;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .toggle-json:hover {
+            background: #475569;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f4f6;
+            border-radius: 50%;
+            border-top-color: #4f46e5;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .metadata-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .line-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Piping Line Extractor</h1>
+            <p>Upload PDF files to extract piping line numbers using Google Document AI</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section" id="uploadSection">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".pdf">
+                    <button class="file-input-button">
+                        📄 Choose PDF File
+                    </button>
+                </div>
+                <p style="margin-top: 15px; color: #64748b;">
+                    Or drag and drop a PDF file here
+                </p>
+                <div id="fileInfo" class="file-info hidden">
+                    <strong>Selected file:</strong> <span id="fileName"></span><br>
+                    <strong>Size:</strong> <span id="fileSize"></span>
+                </div>
+                <button id="processButton" class="process-button hidden">
+                    🚀 Extract Piping Lines
+                </button>
+            </div>
+
+            <div id="status" class="status hidden"></div>
+
+            <div id="results" class="results hidden">
+                <h2>📊 Extraction Results</h2>
+                
+                <div id="metadata" class="metadata">
+                    <h3>📋 Document Information</h3>
+                    <div id="metadataContent" class="metadata-grid"></div>
+                </div>
+
+                <div id="pipingLines" class="piping-lines">
+                    <h3 id="pipingLinesHeader">🔧 Extracted Piping Lines</h3>
+                    <div id="pipingLinesContent"></div>
+                </div>
+
+                <button id="toggleJson" class="toggle-json">📄 Show Raw JSON</button>
+                <div id="jsonView" class="json-view hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadSection = document.getElementById('uploadSection');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const processButton = document.getElementById('processButton');
+        const status = document.getElementById('status');
+        const results = document.getElementById('results');
+        const metadataContent = document.getElementById('metadataContent');
+        const pipingLinesContent = document.getElementById('pipingLinesContent');
+        const pipingLinesHeader = document.getElementById('pipingLinesHeader');
+        const jsonView = document.getElementById('jsonView');
+        const toggleJson = document.getElementById('toggleJson');
+
+        let selectedFile = null;
+        let lastResults = null;
+
+        // File input handler
+        fileInput.addEventListener('change', handleFileSelect);
+
+        // Drag and drop handlers
+        uploadSection.addEventListener('dragover', handleDragOver);
+        uploadSection.addEventListener('dragleave', handleDragLeave);
+        uploadSection.addEventListener('drop', handleDrop);
+
+        // Process button handler
+        processButton.addEventListener('click', processFile);
+
+        // Toggle JSON view
+        toggleJson.addEventListener('click', toggleJsonView);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectFile(file);
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            uploadSection.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            uploadSection.classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            uploadSection.classList.remove('dragover');
+            
+            const files = event.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/pdf') {
+                    selectFile(file);
+                } else {
+                    showStatus('error', '❌ Please select a PDF file');
+                }
+            }
+        }
+
+        function selectFile(file) {
+            selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.classList.remove('hidden');
+            processButton.classList.remove('hidden');
+            hideStatus();
+            hideResults();
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function processFile() {
+            if (!selectedFile) {
+                showStatus('error', '❌ Please select a PDF file first');
+                return;
+            }
+
+            processButton.disabled = true;
+            showStatus('loading', '<div class="loading-spinner"></div>Processing PDF file... This may take a few moments.');
+            hideResults();
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('http://localhost:8000/extract-piping-lines/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Server error (${response.status}): ${errorText}`);
+                }
+
+                const data = await response.json();
+                lastResults = data;
+                
+                showStatus('success', `✅ Successfully processed! Found ${data.metadata.total_found} piping lines.`);
+                displayResults(data);
+
+            } catch (error) {
+                console.error('Error processing file:', error);
+                let errorMessage = '❌ Error processing file: ';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage += 'Cannot connect to server. Make sure the FastAPI server is running on localhost:8000';
+                } else {
+                    errorMessage += error.message;
+                }
+                
+                showStatus('error', errorMessage);
+            } finally {
+                processButton.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            // Display metadata
+            const metadata = data.metadata;
+            metadataContent.innerHTML = `
+                <div class="metadata-item">
+                    <strong>Source File</strong>
+                    ${metadata.source_file}
+                </div>
+                <div class="metadata-item">
+                    <strong>Total Found</strong>
+                    ${metadata.total_found} lines
+                </div>
+                <div class="metadata-item">
+                    <strong>PID Identifier</strong>
+                    ${metadata.pid_identifier || 'Not found'}
+                </div>
+                <div class="metadata-item">
+                    <strong>Processed At</strong>
+                    ${new Date(metadata.extraction_timestamp).toLocaleString()}
+                </div>
+            `;
+
+            // Display piping lines
+            pipingLinesHeader.textContent = `🔧 Extracted Piping Lines (${data.piping_lines.length})`;
+            
+            if (data.piping_lines.length > 0) {
+                pipingLinesContent.innerHTML = data.piping_lines.map(line => `
+                    <div class="piping-line">
+                        <div class="line-number">${line.piping_line_number}</div>
+                        <div class="line-details">
+                            <div><strong>Text Line:</strong> ${line.text_line_number}</div>
+                            <div><strong>Context:</strong> ${line.context}</div>
+                            <div><strong>Coordinates:</strong> 
+                                ${line.coordinates ? 
+                                    `(${line.coordinates.x}, ${line.coordinates.y}) ${line.coordinates.width}×${line.coordinates.height}` : 
+                                    'N/A'}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                pipingLinesContent.innerHTML = '<div class="piping-line">No piping lines found in this document.</div>';
+            }
+
+            // Update JSON view
+            jsonView.textContent = JSON.stringify(data, null, 2);
+
+            results.classList.remove('hidden');
+        }
+
+        function toggleJsonView() {
+            if (jsonView.classList.contains('hidden')) {
+                jsonView.classList.remove('hidden');
+                toggleJson.textContent = '📄 Hide Raw JSON';
+            } else {
+                jsonView.classList.add('hidden');
+                toggleJson.textContent = '📄 Show Raw JSON';
+            }
+        }
+
+        function showStatus(type, message) {
+            status.className = `status ${type}`;
+            status.innerHTML = message;
+            status.classList.remove('hidden');
+        }
+
+        function hideStatus() {
+            status.classList.add('hidden');
+        }
+
+        function hideResults() {
+            results.classList.add('hidden');
+            jsonView.classList.add('hidden');
+            toggleJson.textContent = '📄 Show Raw JSON';
+        }
+
+        // Check server status on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/health');
+                if (response.ok) {
+                    const health = await response.json();
+                    console.log('Server status:', health);
+                } else {
+                    showStatus('error', '❌ Server is not responding. Please start the FastAPI server.');
+                }
+            } catch (error) {
+                showStatus('error', '❌ Cannot connect to server. Please start the FastAPI server on localhost:8000');
+            }
+        });
+    </script>
+</body>
+</html> 
